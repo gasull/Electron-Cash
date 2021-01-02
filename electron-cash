@@ -44,7 +44,6 @@ from electroncash import (
     keystore,
     networks,
     util,
-    websockets,
 )
 from electroncash.commands import (
     Commands,
@@ -440,6 +439,9 @@ def run_start(config, config_options, subcommand):
         daemon_thread = daemon.Daemon(config, file_desc, False, plugins)
         daemon_thread.start()
         if config.get("websocket_server"):
+            # The websockets module relies on an optional module that isn't
+            # always available: SimpleWebSocketServer
+            from electroncash import websockets  # pylint: disable=C0415
             websockets.WebSocketServer(config, daemon_thread.network).start()
         if config.get("requests_dir"):
             requests_path = os.path.join(config.get("requests_dir"), "index.html")
