@@ -88,7 +88,7 @@ Install the python dependencies::
 
 Create translations (optional)::
 
-    sudo apt-get install python-requests gettext
+    sudo apt-get install python3-requests gettext
     ./contrib/make_locale
 
 Compile libsecp256k1 (optional, yet highly recommended)::
