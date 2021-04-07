@@ -26,6 +26,7 @@
 import copy
 import datetime
 import json
+import sys
 import time
 
 from enum import Enum, auto
@@ -35,6 +36,7 @@ from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 
 from electroncash import cashacct
+from electroncash import get_config
 from electroncash import web
 
 from electroncash.address import Address, PublicKey, ScriptOutput
@@ -48,7 +50,11 @@ from .util import *
 
 dialogs = []  # Otherwise python randomly garbage collects the dialogs...
 
-if False:
+should_use_freetype = False
+if sys.platform in {"cygwin", "win32"}:
+    should_use_freetype = bool(get_config().get("windows_qt_use_freetype"))
+
+if should_use_freetype:
     # NB: on Qt for Windows the 'ⓢ' symbol looks aliased and bad. So we do this
     # for windows.
     SCHNORR_SIGIL = "(S)"
