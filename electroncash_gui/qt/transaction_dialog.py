@@ -52,7 +52,11 @@ dialogs = []  # Otherwise python randomly garbage collects the dialogs...
 
 should_use_freetype = False
 if sys.platform in {"cygwin", "win32"}:
-    should_use_freetype = bool(get_config().get("windows_qt_use_freetype"))
+    config = get_config()
+    if config is None:
+        should_use_freetype = False
+    else:
+        should_use_freetype = bool(config.get("windows_qt_use_freetype"))
 
 if should_use_freetype:
     # NB: on Qt for Windows the 'ⓢ' symbol looks aliased and bad. So we do this
