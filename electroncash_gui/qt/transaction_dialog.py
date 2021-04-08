@@ -50,21 +50,6 @@ from .util import *
 
 dialogs = []  # Otherwise python randomly garbage collects the dialogs...
 
-should_use_freetype = False
-if sys.platform in {"cygwin", "win32"}:
-    config = get_config()
-    if config is None:
-        should_use_freetype = False
-    else:
-        should_use_freetype = bool(config.get("windows_qt_use_freetype"))
-
-if should_use_freetype:
-    # NB: on Qt for Windows the 'ⓢ' symbol looks aliased and bad. So we do this
-    # for windows.
-    SCHNORR_SIGIL = "(S)"
-else:
-    # On Linux & macOS it looks fine so we go with the more fancy unicode
-    SCHNORR_SIGIL = "ⓢ"
 
 def show_transaction(tx, parent, desc=None, prompt_if_unsaved=False):
     d = TxDialog(tx, parent, desc, prompt_if_unsaved)
@@ -554,7 +539,10 @@ class TxDialog(QDialog, MessageBoxMixin, PrintError):
             # it makes no sense to enable this checkbox if the network is offline
             chk.setHidden(True)
 
-        self.schnorr_label = QLabel(_('{} = Schnorr signed').format(SCHNORR_SIGIL))
+        schnorr_sigil = TxDialog._get_schnorr_sigil()
+        self.schnorr_label = QLabel(
+            _('{} = Schnorr signed').format(schnorr_sigil)
+        )
         self.schnorr_label.setAlignment(Qt.AlignVCenter | Qt.AlignRight)
         f = self.schnorr_label.font()
         f.setPointSize(f.pointSize()-1)  # make it a little smaller
@@ -680,7 +668,8 @@ class TxDialog(QDialog, MessageBoxMixin, PrintError):
                     cursor.insertText(format_amount(x['value']), ext)
                 if self.tx.is_schnorr_signed(i):
                     # Schnorr
-                    cursor.insertText(' {}'.format(SCHNORR_SIGIL), ext)
+                    schnorr_sigil = TxDialog._get_schnorr_sigil()
+                    cursor.insertText(' {}'.format(schnorr_sigil), ext)
                     has_schnorr = True
             cursor.insertBlock()
 
@@ -911,3 +900,20 @@ class TxDialog(QDialog, MessageBoxMixin, PrintError):
             menu.addAction(_("Copy Selected Text"), lambda: self._copy_to_clipboard(None, o_text))
         menu.addAction(_("Select All"), o_text.selectAll)
         menu.exec_(global_pos)
+
+    @staticmethod
+    def _get_schnorr_sigil() -> str:
+        """Get the right symbol for the platform"""
+        should_use_freetype = False
+        if sys.platform in {"cygwin", "win32"}:
+            config = get_config()
+            if config is not None:
+                windows_qt_use_freetype = config.get("windows_qt_use_freetype")
+                should_use_freetype = bool(windows_qt_use_freetype)
+
+        if should_use_freetype:
+            # On Qt for Windows the 'ⓢ' symbol looks aliased and bad. So we
+            # do this for windows.
+            return "(S)"
+        # On Linux & macOS it looks fine so we go with the more fancy unicode
+        return "ⓢ"
