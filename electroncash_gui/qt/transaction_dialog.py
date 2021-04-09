@@ -910,10 +910,10 @@ class TxDialog(QDialog, MessageBoxMixin, PrintError):
             if config is not None:
                 windows_qt_use_freetype = config.get("windows_qt_use_freetype")
                 should_use_freetype = bool(windows_qt_use_freetype)
-
-        if should_use_freetype:
-            # On Qt for Windows the 'ⓢ' symbol looks aliased and bad. So we
-            # do this for windows.
-            return "(S)"
-        # On Linux & macOS it looks fine so we go with the more fancy unicode
+            if not should_use_freetype:
+                # On Qt for Windows the 'ⓢ' symbol looks aliased and bad. So we
+                # do this for windows.
+                return "(S)"
+        # On Linux & macOS it looks fine so we go with the more fancy unicode.
+        # Use FreeType.
         return "ⓢ"
