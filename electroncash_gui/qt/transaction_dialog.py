@@ -904,7 +904,7 @@ class TxDialog(QDialog, MessageBoxMixin, PrintError):
     @staticmethod
     def _get_schnorr_sigil() -> str:
         """Get the right symbol for the platform"""
-        should_use_freetype = False
+        should_use_freetype = True
         if sys.platform in {"cygwin", "win32"}:
             config = get_config()
             if config is not None:
