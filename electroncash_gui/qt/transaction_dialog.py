@@ -202,6 +202,8 @@ class TxDialog(QDialog, MessageBoxMixin, PrintError):
         parent.labels_updated_signal.connect(self.update_tx_if_in_wallet)
         parent.network_signal.connect(self.got_verified_tx)
 
+        self._schnorr_sigil = TxDialog._get_schnorr_sigil()
+
     @classmethod
     def _make_freeze_button_text(cls, op: FreezeOp = FreezeOp.Freeze, num_coins: int = 0) -> str:
         if op == cls.FreezeOp.Freeze:
@@ -539,9 +541,8 @@ class TxDialog(QDialog, MessageBoxMixin, PrintError):
             # it makes no sense to enable this checkbox if the network is offline
             chk.setHidden(True)
 
-        schnorr_sigil = TxDialog._get_schnorr_sigil()
         self.schnorr_label = QLabel(
-            _('{} = Schnorr signed').format(schnorr_sigil)
+            _('{} = Schnorr signed').format(self._schnorr_sigil)
         )
         self.schnorr_label.setAlignment(Qt.AlignVCenter | Qt.AlignRight)
         f = self.schnorr_label.font()
@@ -668,8 +669,7 @@ class TxDialog(QDialog, MessageBoxMixin, PrintError):
                     cursor.insertText(format_amount(x['value']), ext)
                 if self.tx.is_schnorr_signed(i):
                     # Schnorr
-                    schnorr_sigil = TxDialog._get_schnorr_sigil()
-                    cursor.insertText(' {}'.format(schnorr_sigil), ext)
+                    cursor.insertText(' {}'.format(self._schnorr_sigil), ext)
                     has_schnorr = True
             cursor.insertBlock()
 
