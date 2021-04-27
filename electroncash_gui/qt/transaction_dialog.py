@@ -72,6 +72,7 @@ class TxDialog(QDialog, MessageBoxMixin, PrintError):
         '''Transactions in the wallet will show their description.
         Pass desc to give a description for txs not yet in the wallet.
         '''
+        self._schnorr_sigil = TxDialog._get_schnorr_sigil()
         # We want to be a top-level window
         QDialog.__init__(self, parent=None)
         # Take a copy; it might get updated in the main window by
@@ -201,8 +202,6 @@ class TxDialog(QDialog, MessageBoxMixin, PrintError):
         parent.history_updated_signal.connect(self.update_tx_if_in_wallet)
         parent.labels_updated_signal.connect(self.update_tx_if_in_wallet)
         parent.network_signal.connect(self.got_verified_tx)
-
-        self._schnorr_sigil = TxDialog._get_schnorr_sigil()
 
     @classmethod
     def _make_freeze_button_text(cls, op: FreezeOp = FreezeOp.Freeze, num_coins: int = 0) -> str:
